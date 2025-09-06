@@ -1,28 +1,20 @@
-export const STORAGE_KEYS = {
-  LINKS: 'shortlinks_v1',
-  LOGS: 'app_logs_v1'
+import { getLinks } from './storage';
+
+const CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
+export const generateShortcode = (length = 6) => {
+  const links = getLinks();
+  const exists = (code) => links.some(l => l.shortcode === code);
+  let code = '';
+  do {
+    code = Array.from({ length })
+      .map(() => CHARS[Math.floor(Math.random() * CHARS.length)])
+      .join('');
+  } while (exists(code));
+  return code;
 };
 
-export const getLinks = () => {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEYS.LINKS) || '[]');
-  } catch {
-    return [];
-  }
-};
-
-export const saveLinks = (links) => {
-  localStorage.setItem(STORAGE_KEYS.LINKS, JSON.stringify(links));
-};
-
-export const getLogs = () => {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEYS.LOGS) || '[]');
-  } catch {
-    return [];
-  }
-};
-
-export const saveLogs = (logs) => {
-  localStorage.setItem(STORAGE_KEYS.LOGS, JSON.stringify(logs));
+export const isValidCustomShortcode = (s) => {
+  if (!s) return false;
+  return /^[A-Za-z0-9]{4,12}$/.test(s);
 };
